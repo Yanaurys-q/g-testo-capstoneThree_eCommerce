@@ -1,21 +1,21 @@
 package org.yearup.data.mysql;
 
-
-import org.yearup.data.CategoriesDao;
+import org.yearup.data.CategoryDao;
 import org.yearup.models.Category;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class MySqlCategoriesDao implements CategoriesDao
+public class MySqlCategoryDao implements CategoryDao
 {
     private final JdbcTemplate jdbcTemplate;
 
-    public MySqlCategoriesDao(JdbcTemplate jdbcTemplate)
+    public MySqlCategoryDao(JdbcTemplate jdbcTemplate)
     {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -39,31 +39,35 @@ public class MySqlCategoriesDao implements CategoriesDao
     }
 
     @Override
-    public Category findById(int id)
+    public Category getById(int categoryId)
     {
         return jdbcTemplate.queryForObject(
-                "SELECT * FROM categories WHERE category_id = ?", categoryMapper, id);
+                "SELECT * FROM categories WHERE category_id = ?", categoryMapper, categoryId
+        );
     }
 
     @Override
-    public void create(Category category)
+    public Category create(Category category)
     {
         jdbcTemplate.update(
                 "INSERT INTO categories (name, description) VALUES (?, ?)",
-                category.getName(), category.getDescription());
+                category.getName(), category.getDescription()
+        );
+        return category;
     }
 
     @Override
-    public void update(Category category)
+    public void update(int categoryId, Category category)
     {
         jdbcTemplate.update(
                 "UPDATE categories SET name=?, description=? WHERE category_id=?",
-                category.getName(), category.getDescription(), category.getCategoryId());
+                category.getName(), category.getDescription(), categoryId
+        );
     }
 
     @Override
-    public void delete(int id)
+    public void delete(int categoryId)
     {
-        jdbcTemplate.update("DELETE FROM categories WHERE category_id=?", id);
+        jdbcTemplate.update("DELETE FROM categories WHERE category_id=?", categoryId);
     }
 }

@@ -22,6 +22,11 @@ public class MySqlOrdersDao extends MySqlDaoBase implements OrdersDao
     }
 
     @Override
+    public ShoppingCart getByUserId(int userId) {
+        return null;
+    }
+
+    @Override
     public Order createOrder(int userId, ShoppingCart cart)
     {
         String orderSql = "INSERT INTO orders (user_id, order_date, total_amount) VALUES (?, ?, ?)";

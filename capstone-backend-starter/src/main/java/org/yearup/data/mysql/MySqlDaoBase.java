@@ -1,6 +1,6 @@
 package org.yearup.data.mysql;
 
-import org.yearup.models.Profile;
+import org.yearup.models.ShoppingCart;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,5 +20,5 @@ public abstract class MySqlDaoBase
         return dataSource.getConnection();
     }
 
-    public abstract Profile getByUserId(int userId);
+    public abstract ShoppingCart getByUserId(int userId);
 }

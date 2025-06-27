@@ -21,7 +21,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         String sql = "INSERT INTO profiles (user_id, first_name, last_name, phone, email, address, city, state, zip) " +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection connection = getConnection())
+        try (Connection connection = getConnection())
         {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, profile.getUserId());
@@ -49,13 +49,13 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
     {
         String sql = "SELECT * FROM profiles WHERE user_id = ?";
 
-        try(Connection connection = getConnection())
+        try (Connection connection = getConnection())
         {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
 
-            if(rs.next())
+            if (rs.next())
             {
                 Profile profile = new Profile();
                 profile.setUserId(rs.getInt("user_id"));
@@ -71,7 +71,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
             }
             return null;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
@@ -83,7 +83,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         String sql = "UPDATE profiles SET first_name = ?, last_name = ?, phone = ?, email = ?, address = ?, city = ?, state = ?, zip = ? " +
                 "WHERE user_id = ?";
 
-        try(Connection connection = getConnection())
+        try (Connection connection = getConnection())
         {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, profile.getFirstName());
@@ -98,7 +98,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
 
             ps.executeUpdate();
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             throw new RuntimeException(e);
         }

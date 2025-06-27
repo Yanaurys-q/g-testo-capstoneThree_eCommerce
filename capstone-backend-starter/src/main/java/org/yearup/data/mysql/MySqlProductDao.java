@@ -1,22 +1,15 @@
 package org.yearup.data.mysql;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
 import org.yearup.models.Product;
 import org.yearup.data.ProductDao;
-import org.yearup.models.Profile;
+import org.yearup.models.ShoppingCart;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Component
 public class MySqlProductDao extends MySqlDaoBase implements ProductDao
@@ -27,7 +20,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     }
 
     @Override
-    public Profile getByUserId(int userId) {
+    public ShoppingCart getByUserId(int userId) {
         return null;
     }
 
@@ -79,9 +72,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     public List<Product> listByCategoryId(int categoryId)
     {
         List<Product> products = new ArrayList<>();
-
-        String sql = "SELECT * FROM products " +
-                    " WHERE category_id = ? ";
+        String sql = "SELECT * FROM products WHERE category_id = ?";
 
         try (Connection connection = getConnection())
         {
@@ -103,7 +94,6 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 
         return products;
     }
-
 
     @Override
     public Product getById(int productId)
@@ -131,9 +121,8 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     @Override
     public Product create(Product product)
     {
-
-        String sql = "INSERT INTO products(name, price, category_id, description, color, image_url, stock, featured) " +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO products (name, price, category_id, description, color, image_url, stock, featured) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = getConnection())
         {
@@ -149,16 +138,13 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 
             int rowsAffected = statement.executeUpdate();
 
-            if (rowsAffected > 0) {
-                // Retrieve the generated keys
+            if (rowsAffected > 0)
+            {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
-
-                if (generatedKeys.next()) {
-                    // Retrieve the auto-incremented ID
-                    int orderId = generatedKeys.getInt(1);
-
-                    // get the newly inserted category
-                    return getById(orderId);
+                if (generatedKeys.next())
+                {
+                    int newProductId = generatedKeys.getInt(1);
+                    return getById(newProductId);
                 }
             }
         }
@@ -172,16 +158,8 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     @Override
     public void update(int productId, Product product)
     {
-        String sql = "UPDATE products" +
-                " SET name = ? " +
-                "   , price = ? " +
-                "   , category_id = ? " +
-                "   , description = ? " +
-                "   , color = ? " +
-                "   , image_url = ? " +
-                "   , stock = ? " +
-                "   , featured = ? " +
-                " WHERE product_id = ?;";
+        String sql = "UPDATE products SET name = ?, price = ?, category_id = ?, description = ?, color = ?, image_url = ?, stock = ?, featured = ? " +
+                "WHERE product_id = ?";
 
         try (Connection connection = getConnection())
         {
@@ -204,26 +182,10 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
         }
     }
 
-    @PutMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void updateProduct(@PathVariable int id, @RequestBody Product product)
-    {
-        try
-        {
-            productDao.update(id, product);
-        }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
-    }
-
     @Override
     public void delete(int productId)
     {
-
-        String sql = "DELETE FROM products " +
-                " WHERE product_id = ?;";
+        String sql = "DELETE FROM products WHERE product_id = ?";
 
         try (Connection connection = getConnection())
         {

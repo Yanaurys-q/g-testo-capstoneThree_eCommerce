@@ -61,4 +61,24 @@ public class Order
     {
         this.lineItems = lineItems;
     }
+
+    public void setTotalAmount(BigDecimal total)
+    {
+        setTotal(total);
+    }
+
+    public BigDecimal getTotalAmount()
+    {
+        return getTotal();
+    }
+
+    public void setItems(List<OrderLineItem> items)
+    {
+        setLineItems(items);
+    }
+
+    public List<OrderLineItem> getItems()
+    {
+        return getLineItems();
+    }
 }
