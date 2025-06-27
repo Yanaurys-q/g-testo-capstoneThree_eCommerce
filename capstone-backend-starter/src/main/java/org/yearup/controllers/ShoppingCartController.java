@@ -36,7 +36,7 @@ public class ShoppingCartController
         this.productDao = productDao;
     }
 
-    // GET /cart
+    // GET
     @GetMapping("")
     public ShoppingCart getCart(Principal principal)
     {
