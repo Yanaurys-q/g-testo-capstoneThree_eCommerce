@@ -1,6 +1,5 @@
 package org.yearup.data;
 
-import org.yearup.models.Profile;
 import org.yearup.models.User;
 
 import java.util.List;
@@ -19,5 +18,5 @@ public interface UserDao {
 
     boolean exists(String username);
 
-    Profile findByUsername(String username);
+    User findByUsername(String username);
 }

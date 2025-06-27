@@ -22,7 +22,7 @@ public class ProfileController
     private int getCurrentUserId()
     {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userDao.findByUsername(username).getUserId();
+        return userDao.findByUsername(username).getId();
     }
 
     @GetMapping

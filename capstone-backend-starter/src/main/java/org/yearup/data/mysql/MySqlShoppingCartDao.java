@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
-import org.yearup.data.mysql.MySqlDaoBase;
 import org.yearup.models.Product;
+import org.yearup.models.Profile;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
 
@@ -28,7 +28,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     }
 
     @Override
-    public ShoppingCart getByUserId(int userId)
+    public Profile getByUserId(int userId)
     {
         ShoppingCart cart = new ShoppingCart();
 

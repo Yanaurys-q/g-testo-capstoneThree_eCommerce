@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.yearup.models.Product;
 import org.yearup.data.ProductDao;
+import org.yearup.models.Profile;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -16,12 +17,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Component
 public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 {
     public MySqlProductDao(DataSource dataSource)
     {
         super(dataSource);
+    }
+
+    @Override
+    public Profile getByUserId(int userId) {
+        return null;
     }
 
     @Override
