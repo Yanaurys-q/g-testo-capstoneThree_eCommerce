@@ -49,28 +49,21 @@ public class AuthenticationController
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto)
     {
-        UsernamePasswordAuthenticationToken authenticationToken =
+        UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.createToken(authentication, false);
 
-        try
-        {
-            User user = userDao.getByUserName(loginDto.getUsername());
-
-            if (user == null)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-            return new ResponseEntity<>(new LoginResponseDto(jwt, user), httpHeaders, HttpStatus.OK);
+        User user = userDao.getByUsername(loginDto.getUsername());
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        return new ResponseEntity<>(new LoginResponseDto(jwt, user), headers, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.CREATED)

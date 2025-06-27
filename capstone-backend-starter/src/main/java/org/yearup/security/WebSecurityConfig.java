@@ -1,18 +1,22 @@
 package org.yearup.security;
 
-import org.yearup.security.jwt.JWTConfigurer;
-import org.yearup.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.yearup.security.jwt.JWTConfigurer;
+import org.yearup.security.jwt.TokenProvider;
 
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -36,36 +40,45 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // WARNING: Plaintext passwords! For demo only!
+        return NoOpPasswordEncoder.getInstance();
     }
 
-    /**
-     * Configure paths and requests that should be ignored by Spring Security
-     * @param web
-     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userModelDetailsService).passwordEncoder(passwordEncoder());
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
 
-    /**
-     * Configure security settings
-     * @param httpSecurity
-     * @throws Exception
-     */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
-                // create no session
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
+                .authorizeRequests()
+                .antMatchers("/login", "/register").permitAll()        // Public endpoints
+                .antMatchers("/products/**", "/categories/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/").permitAll()
+                .anyRequest().authenticated()
 
                 .and()
                 .apply(securityConfigurerAdapter());
@@ -75,4 +88,3 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new JWTConfigurer(tokenProvider);
     }
 }
-

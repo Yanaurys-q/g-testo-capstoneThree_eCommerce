@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MySqlUserDao extends MySqlDaoBase implements UserDao
+public abstract class MySqlUserDao extends MySqlDaoBase implements UserDao
 {
     public MySqlUserDao(DataSource dataSource)
     {

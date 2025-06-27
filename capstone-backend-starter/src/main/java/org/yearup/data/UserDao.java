@@ -19,4 +19,6 @@ public interface UserDao {
     boolean exists(String username);
 
     User findByUsername(String username);
+
+    User getByUsername(String username);
 }

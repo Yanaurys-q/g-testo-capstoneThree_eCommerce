@@ -1,26 +1,18 @@
 package org.yearup.security;
 
-
-import org.yearup.data.UserDao;
 import org.yearup.models.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.yearup.data.UserDao;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
-/**
- * Authenticate a user from the database.
- */
-@Component("userDetailsService")
+@Service
 public class UserModelDetailsService implements UserDetailsService {
-
-    private final Logger log = LoggerFactory.getLogger(UserModelDetailsService.class);
 
     private final UserDao userDao;
 
@@ -29,22 +21,17 @@ public class UserModelDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String login) {
-        log.debug("Authenticating user '{}'", login);
-        String lowercaseLogin = login.toLowerCase();
-        return createSpringSecurityUser(lowercaseLogin, userDao.getByUserName(lowercaseLogin));
-    }
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userDao.getByUsername(username);
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
-        if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found: " + username);
         }
-        List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-                .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(),
-                grantedAuthorities);
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(), // should be a BCrypt-hashed password
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
     }
 }
-

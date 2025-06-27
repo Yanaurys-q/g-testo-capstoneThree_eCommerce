@@ -80,6 +80,23 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
+    public User getByUsername(String username) {
+        String sql = "SELECT user_id, username, hashed_password, role FROM users WHERE username = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("hashed_password"));
+                user.setAuthorities(rs.getString("role"));
+                return user;
+            }, username);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public User create(User user) {
         String sql = "INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
