@@ -2,7 +2,7 @@ package org.yearup.data.mysql;
 
 import org.springframework.stereotype.Repository;
 import org.yearup.data.UserDao;
-import org.yearup.models.ShoppingCart;
+import org.yearup.models.Profile;
 import org.yearup.models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -20,7 +20,7 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
     }
 
     @Override
-    public ShoppingCart getByUserId(int userId) {
+    public Profile getByUserId(int userId) {
         return null;
     }
 

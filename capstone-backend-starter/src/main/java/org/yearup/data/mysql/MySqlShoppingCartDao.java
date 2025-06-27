@@ -26,7 +26,6 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         this.productDao = productDao;
     }
 
-    // This is your actual implementation
     @Override
     public ShoppingCart getCartForUser(int userId)
     {
@@ -62,6 +61,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         return cart;
     }
 
+
     @Override
     public ShoppingCart getByUserId(int userId)
     {
@@ -84,7 +84,6 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
             if (rs.next())
             {
-                // Item already exists, just increase quantity
                 PreparedStatement updateStmt = connection.prepareStatement(updateSql);
                 updateStmt.setInt(1, userId);
                 updateStmt.setInt(2, productId);

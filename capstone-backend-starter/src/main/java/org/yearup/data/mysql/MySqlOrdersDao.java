@@ -19,7 +19,7 @@ public class MySqlOrdersDao extends MySqlDaoBase implements OrdersDao
     }
 
     @Override
-    public ShoppingCart getByUserId(int userId) {
+    public Profile getByUserId(int userId) {
         return null;
     }
 

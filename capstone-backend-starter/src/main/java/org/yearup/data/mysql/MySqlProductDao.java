@@ -3,7 +3,7 @@ package org.yearup.data.mysql;
 import org.springframework.stereotype.Component;
 import org.yearup.models.Product;
 import org.yearup.data.ProductDao;
-import org.yearup.models.ShoppingCart;
+import org.yearup.models.Profile;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     }
 
     @Override
-    public ShoppingCart getByUserId(int userId) {
+    public Profile getByUserId(int userId) {
         return null;
     }
 

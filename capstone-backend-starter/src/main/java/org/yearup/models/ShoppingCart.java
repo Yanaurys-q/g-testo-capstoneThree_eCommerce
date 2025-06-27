@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Collection;
 
-public class ShoppingCart
-{
+public class ShoppingCart extends Profile {
     private Map<Integer, ShoppingCartItem> items = new HashMap<>();
 
     public ShoppingCart()
