@@ -1,0 +1,13 @@
+package org.yearup.data;
+
+
+import org.yearup.models.Profile;
+
+public interface ProfileDao
+{
+    Profile create(Profile profile);
+
+    Profile getByUserId(int currentUserId);
+
+    void update(Profile profile);
+}
