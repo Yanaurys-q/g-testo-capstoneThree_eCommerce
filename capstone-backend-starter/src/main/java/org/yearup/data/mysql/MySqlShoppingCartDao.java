@@ -26,8 +26,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         this.productDao = productDao;
     }
 
+    // This is your actual implementation
     @Override
-    public ShoppingCart getByUserId(int userId)
+    public ShoppingCart getCartForUser(int userId)
     {
         ShoppingCart cart = new ShoppingCart();
 
@@ -62,8 +63,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     }
 
     @Override
-    public ShoppingCart getCartForUser(int userId) {
-        return null;
+    public ShoppingCart getByUserId(int userId)
+    {
+        return getCartForUser(userId);
     }
 
     @Override
@@ -90,7 +92,6 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             }
             else
             {
-                // New item, insert with quantity 1
                 PreparedStatement insertStmt = connection.prepareStatement(insertSql);
                 insertStmt.setInt(1, userId);
                 insertStmt.setInt(2, productId);

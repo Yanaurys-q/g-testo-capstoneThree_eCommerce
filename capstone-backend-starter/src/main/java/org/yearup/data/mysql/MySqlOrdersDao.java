@@ -1,10 +1,7 @@
 package org.yearup.data.mysql;
 
 import org.yearup.data.OrdersDao;
-import org.yearup.models.Order;
-import org.yearup.models.OrderLineItem;
-import org.yearup.models.ShoppingCart;
-import org.yearup.models.ShoppingCartItem;
+import org.yearup.models.*;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -63,12 +60,12 @@ public class MySqlOrdersDao extends MySqlDaoBase implements OrdersDao
 
             // Insert the order line items
             itemStmt = conn.prepareStatement(orderItemSql);
-            for (ShoppingCartItem item : cart.getItems())
+            for (ShoppingCartItem item : cart.getItemList())
             {
                 itemStmt.setInt(1, orderId);
-                itemStmt.setInt(2, item.getProductId());
+                itemStmt.setInt(2, item.getProduct().getProductId());
                 itemStmt.setInt(3, item.getQuantity());
-                itemStmt.setBigDecimal(4, item.getUnitPrice());
+                itemStmt.setBigDecimal(4, item.getProduct().getPrice());
                 itemStmt.addBatch();
             }
             itemStmt.executeBatch();
@@ -80,19 +77,19 @@ public class MySqlOrdersDao extends MySqlDaoBase implements OrdersDao
             order.setOrderId(orderId);
             order.setUserId(userId);
             order.setOrderDate(LocalDateTime.now());
-            order.setTotalAmount(cart.getTotal());
+            order.setTotal(cart.getTotal());
 
             List<OrderLineItem> orderItems = new ArrayList<>();
-            for (ShoppingCartItem item : cart.getItems())
+            for (ShoppingCartItem item : cart.getItemList())
             {
                 OrderLineItem oli = new OrderLineItem();
                 oli.setOrderId(orderId);
-                oli.setProductId(item.getProductId());
+                oli.setProductId(item.getProduct().getProductId());
                 oli.setQuantity(item.getQuantity());
-                oli.setUnitPrice(item.getUnitPrice());
+                oli.setUnitPrice(item.getProduct().getPrice());
                 orderItems.add(oli);
             }
-            order.setItems(orderItems);
+            order.setLineItems(orderItems);
 
             return order;
         }

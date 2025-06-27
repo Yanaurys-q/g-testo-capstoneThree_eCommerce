@@ -38,17 +38,6 @@ public class ShoppingCartItem
         this.quantity = quantity;
     }
 
-
-    public int getProductId()
-    {
-        return product != null ? product.getProductId() : 0;
-    }
-
-    public BigDecimal getUnitPrice()
-    {
-        return product != null ? product.getPrice() : BigDecimal.ZERO;
-    }
-
     public BigDecimal getLineTotal()
     {
         if (product == null)

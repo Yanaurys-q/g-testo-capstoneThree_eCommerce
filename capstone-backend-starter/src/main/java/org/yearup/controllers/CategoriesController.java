@@ -5,7 +5,6 @@ import org.yearup.models.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -13,7 +12,7 @@ import java.util.List;
 public class CategoriesController
 {
     @Autowired
-    private CategoryDao categoryDao; // <-- singular
+    private CategoryDao categoryDao;
 
     @GetMapping
     public List<Category> getAllCategories()
@@ -31,15 +30,13 @@ public class CategoriesController
     @PostMapping
     public Category addCategory(@RequestBody Category category)
     {
-        categoryDao.create(category);
-        return category;
+        return categoryDao.create(category);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Category updateCategory(@PathVariable int id, @RequestBody Category category)
     {
-        category.setCategoryId(id);
         categoryDao.update(id, category);
         return category;
     }

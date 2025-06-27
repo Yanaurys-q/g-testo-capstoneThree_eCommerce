@@ -5,7 +5,6 @@ import org.yearup.models.Category;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -42,8 +41,7 @@ public class MySqlCategoryDao implements CategoryDao
     public Category getById(int categoryId)
     {
         return jdbcTemplate.queryForObject(
-                "SELECT * FROM categories WHERE category_id = ?", categoryMapper, categoryId
-        );
+                "SELECT * FROM categories WHERE category_id = ?", categoryMapper, categoryId);
     }
 
     @Override
@@ -51,8 +49,7 @@ public class MySqlCategoryDao implements CategoryDao
     {
         jdbcTemplate.update(
                 "INSERT INTO categories (name, description) VALUES (?, ?)",
-                category.getName(), category.getDescription()
-        );
+                category.getName(), category.getDescription());
         return category;
     }
 
@@ -61,8 +58,7 @@ public class MySqlCategoryDao implements CategoryDao
     {
         jdbcTemplate.update(
                 "UPDATE categories SET name=?, description=? WHERE category_id=?",
-                category.getName(), category.getDescription(), categoryId
-        );
+                category.getName(), category.getDescription(), categoryId);
     }
 
     @Override
