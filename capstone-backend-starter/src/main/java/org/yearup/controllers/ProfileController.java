@@ -3,6 +3,7 @@ package org.yearup.controllers;
 import org.yearup.data.ProfileDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.Profile;
+import org.yearup.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,4 +40,5 @@ public class ProfileController
         profileDao.update(profile);
         return profile;
     }
+
 }
