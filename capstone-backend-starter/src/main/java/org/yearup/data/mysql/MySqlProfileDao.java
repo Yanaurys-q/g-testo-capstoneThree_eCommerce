@@ -6,6 +6,7 @@ import org.yearup.models.Profile;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 @Repository
 public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
@@ -42,6 +43,11 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Profile> getAll() {
+        return List.of();
     }
 
     @Override
@@ -102,5 +108,10 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void delete(int userId) {
+
     }
 }

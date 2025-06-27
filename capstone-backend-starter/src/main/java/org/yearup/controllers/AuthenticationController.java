@@ -13,36 +13,42 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import org.yearup.models.Profile;
 import org.yearup.data.ProfileDao;
 import org.yearup.data.UserDao;
+import org.yearup.models.Profile;
+import org.yearup.models.User;
 import org.yearup.models.authentication.LoginDto;
 import org.yearup.models.authentication.LoginResponseDto;
 import org.yearup.models.authentication.RegisterUserDto;
-import org.yearup.models.User;
 import org.yearup.security.jwt.JWTFilter;
 import org.yearup.security.jwt.TokenProvider;
 
 @RestController
 @CrossOrigin
 @PreAuthorize("permitAll()")
-public class AuthenticationController {
-
+public class AuthenticationController
+{
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private UserDao userDao;
-    private ProfileDao profileDao;
+    private final UserDao userDao;
+    private final ProfileDao profileDao;
 
-    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDao userDao, ProfileDao profileDao) {
+    public AuthenticationController(
+            TokenProvider tokenProvider,
+            AuthenticationManagerBuilder authenticationManagerBuilder,
+            UserDao userDao,
+            ProfileDao profileDao
+    )
+    {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDao = userDao;
         this.profileDao = profileDao;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
-
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto)
+    {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
@@ -54,7 +60,8 @@ public class AuthenticationController {
         {
             User user = userDao.getByUserName(loginDto.getUsername());
 
-            if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            if (user == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
@@ -67,32 +74,47 @@ public class AuthenticationController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto newUser) {
-
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto newUser)
+    {
         try
         {
+            System.out.println("Registering: " + newUser.getUsername() + ", role: " + newUser.getRole());
+
             boolean exists = userDao.exists(newUser.getUsername());
             if (exists)
             {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Already Exists.");
             }
 
-
+            // Store as plain text (not recommended in production), or encode if you have a password encoder
             User user = userDao.create(new User(0, newUser.getUsername(), newUser.getPassword(), newUser.getRole()));
 
+            if (user == null || user.getId() == 0)
+            {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User creation failed.");
+            }
 
+            // Fill ALL NOT NULL fields for Profile (replace with real values in production)
             Profile profile = new Profile();
             profile.setUserId(user.getId());
+            profile.setFirstName("FirstName");                     // Placeholder
+            profile.setLastName("LastName");                       // Placeholder
+            profile.setPhone("000-000-0000");                      // Placeholder
+            profile.setEmail(user.getUsername() + "@placeholder.com"); // Placeholder or collect from registration
+            profile.setAddress("123 Placeholder St");
+            profile.setCity("YourCity");
+            profile.setState("XX");
+            profile.setZip("00000");
+
             profileDao.create(profile);
 
             return new ResponseEntity<>(user, HttpStatus.CREATED);
         }
         catch (Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. " + e.getMessage());
         }
     }
-
 }
-

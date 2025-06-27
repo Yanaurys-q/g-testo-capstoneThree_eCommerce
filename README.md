@@ -29,3 +29,40 @@ This project is an enhanced backend API for EasyShop, an online e-commerce store
 - Corrected product duplication issue during updates
 
 - Fixed inaccuracies in product search results through refined query logic
+
+API Endpoints
+Authentication
+Register: POST /register
+
+json
+Copy
+Edit
+{
+"username": "admin",
+"password": "password",
+"confirmPassword": "password",
+"role": "ADMIN"
+}
+Login: POST /login
+
+json
+Copy
+Edit
+{
+"username": "admin",
+"password": "password"
+}
+Returns a JWT token, which must be included as a Bearer token in subsequent requests.
+
+
+### Interesting Code Snippet
+    public List<Product> searchProducts(Integer cat, BigDecimal minPrice, BigDecimal maxPrice, String color) {
+    StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE 1=1 ");
+    List<Object> params = new ArrayList<>();
+    if (cat != null) { sql.append("AND category_id = ? "); params.add(cat); }
+    if (minPrice != null) { sql.append("AND price >= ? "); params.add(minPrice); }
+    if (maxPrice != null) { sql.append("AND price <= ? "); params.add(maxPrice); }
+    if (color != null && !color.isBlank()) { sql.append("AND color = ? "); params.add(color); }
+    return jdbcTemplate.query(sql.toString(), params.toArray(), productRowMapper);
+}
+

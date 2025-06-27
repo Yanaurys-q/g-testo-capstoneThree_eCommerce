@@ -5,6 +5,7 @@ import org.yearup.data.UserDao;
 import org.yearup.models.Profile;
 import org.yearup.models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -25,13 +26,11 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
     }
 
     @Override
-    public User create(User newUser)
-    {
+    public User create(User newUser) {
         String sql = "INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)";
         String hashedPassword = new BCryptPasswordEncoder().encode(newUser.getPassword());
 
-        try (Connection connection = getConnection())
-        {
+        try (Connection connection = getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, newUser.getUsername());
             ps.setString(2, hashedPassword);
@@ -39,15 +38,18 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
 
             ps.executeUpdate();
 
-            // Now get the created user:
-            User user = findByUsername(newUser.getUsername());
-            user.setPassword(""); // clear password for security
-            return user;
+            ResultSet keys = ps.getGeneratedKeys();
+            if (keys.next()) {
+                int id = keys.getInt(1);
+                newUser.setId(id);
+                newUser.setPassword(""); // Don’t return the plain password
+                return newUser;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     @Override
@@ -97,7 +99,24 @@ public class MySqlUserDao extends MySqlDaoBase implements UserDao
 
     @Override
     public User getByUserName(String username) {
-        return null;
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("hashed_password"));
+                user.setRole(rs.getString("role"));
+                return user;
+            } else {
+                throw new UsernameNotFoundException("User not found: " + username);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
